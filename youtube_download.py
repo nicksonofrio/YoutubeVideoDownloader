@@ -1,44 +1,69 @@
 from tkinter import *
 from pytube import YouTube
 from tkinter.scrolledtext import *
-import sys
+from tkinter import filedialog
 
 #Method used to download a single youtube video given a url
 def Downloader():
-    url =YouTube(str(link.get()))
-    video = url.streams.first()
-    download_to_directory = str(directory.get())
-    #given a specific directory the video will be downloaded there. otherwise it downloads in the same directory the script exists
-		if download_to_directory != '':
-			video.download(r'' + download_to_directory)
-		else:
-			video.download()
-    Label(root, text = 'DOWNLOADED', font = 'arial 15').place(x= 650 , y = 190)  
+    val = generalDownload(str(link.get()))
+    if val == 1:
+        Label(root, text ='Download Successful', font = 'arial 20').place(x= 200 , y = 700) 
+    else:
+        Label(root, text ='Download Unsuccessful', font = 'arial 20').place(x= 200 , y = 700) 
 
 #Method used to download multiple youtube videos in a list given their urls
 def MultiDownloader():
-	#grab all of the input text from start to finish
+    #grab all of the input text from start to finish
     result=multi_link_enter.get(1.0, 'end-1c')
     #remove new lines from string and replace with commas
     remove_new_lines = result.replace('\n',',')
     #separate into a list based on commas
     list_of_links = remove_new_lines.split(",")
     i = 0
+    total = 0
+    success_total = 0
     while i < len(list_of_links):
-    	url = list_of_links[i]
-    	i = i + 1
-    	print(url)
-    	if url != '':
-    		url_format = YouTube(url)
-    		video = url_format.streams.first()
-    		download_to_directory = str(directory.get())
-    		#given a specific directory the video will be downloaded there. otherwise it downloads in the same directory the script exists
-    		if download_to_directory != '':
-    			video.download(r'' + download_to_directory)
-    		else:
-    			video.download()
-    		
-    Label(root, text ="Downloaded Videos", font = 'arial 15').place(x= 32 , y = 500) 
+        url = list_of_links[i]
+        i = i + 1
+        if url != '':
+            total = total + 1
+            val = generalDownload(url)
+            success_total = success_total + val
+    display_text = '{} out of {} videos downloaded successfully.'.format(success_total, total)
+    Label(root, text =display_text, font = 'arial 20').place(x= 200 , y = 700)            
+        
+
+def UploadAction(event=None):
+    filename = filedialog.askopenfilename()
+    print('Selected:', filename)
+    file = open(filename,"r")
+    lines = file.readlines()
+    total = 0
+    success_total = 0
+    for line in lines:
+        if line != '':
+            total = total + 1
+            line = line.replace(',','')
+            val = generalDownload(line)
+            success_total = success_total + val
+    display_text = '{} out of {} videos downloaded successfully.'.format(success_total, total)
+    Label(root, text=display_text, font = 'arial 20').place(x= 200 , y = 700) 
+
+def generalDownload(url_string):
+    try:
+        url =YouTube(url_string)
+        video = url.streams.first()
+        download_to_directory = str(directory.get())
+        #given a specific directory the video will be downloaded there. otherwise it downloads in the same directory the script exists
+        if download_to_directory != '':
+                video.download(r'' + download_to_directory)
+        else:
+                video.download()
+        return 1
+    except:
+        return 0
+
+
 
 #create the pop up window
 root = Tk()
@@ -69,6 +94,6 @@ multi_link_enter.place(x=32, y=350)
 #download buttons
 Button(root,text = 'DOWNLOAD', font = 'arial 15 bold' ,bg = 'pale violet red', padx = 2, command = Downloader).place(x=500 ,y = 190)
 Button(root,text = 'DOWNLOAD', font = 'arial 15 bold' ,bg = 'pale violet red', padx = 2, command = MultiDownloader).place(x=700 ,y = 350)
-
+Button(root,bg = 'pale violet red', text='Download Videos By File', font = 'arial 15 bold', command=UploadAction).place(x=32,y=600)
 
 root.mainloop()
