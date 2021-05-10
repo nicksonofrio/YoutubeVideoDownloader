@@ -5,8 +5,8 @@ from tkinter import filedialog
 
 #Method used to download a single youtube video given a url
 def Downloader():
-    val = generalDownload(str(link.get()))
-    if val == 1:
+    downloadResult = downloadIsSuccessful(str(link.get()))
+    if downloadResult == 1:
         Label(root, text ='Download Successful', font = 'arial 20').place(x= 200 , y = 700) 
     else:
         Label(root, text ='Download Unsuccessful', font = 'arial 20').place(x= 200 , y = 700) 
@@ -22,13 +22,12 @@ def MultiDownloader():
     i = 0
     total = 0
     success_total = 0
-    while i < len(list_of_links):
+    for i in range(0, len(list_of_links)):
         url = list_of_links[i]
-        i = i + 1
         if url != '':
             total = total + 1
-            val = generalDownload(url)
-            success_total = success_total + val
+            downloadResult = downloadIsSuccessful(url)
+            success_total = success_total + downloadResult
     display_text = '{} out of {} videos downloaded successfully.'.format(success_total, total)
     Label(root, text =display_text, font = 'arial 20').place(x= 200 , y = 700)            
         
@@ -44,12 +43,12 @@ def UploadAction(event=None):
         if line != '':
             total = total + 1
             line = line.replace(',','')
-            val = generalDownload(line)
-            success_total = success_total + val
+            downloadResult = downloadIsSuccessful(line)
+            success_total = success_total + downloadResult
     display_text = '{} out of {} videos downloaded successfully.'.format(success_total, total)
     Label(root, text=display_text, font = 'arial 20').place(x= 200 , y = 700) 
 
-def generalDownload(url_string):
+def downloadIsSuccessful(url_string):
     try:
         url =YouTube(url_string)
         video = url.streams.first()
